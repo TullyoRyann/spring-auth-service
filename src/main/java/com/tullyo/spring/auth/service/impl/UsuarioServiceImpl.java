@@ -49,12 +49,11 @@ public class UsuarioServiceImpl implements UserDetailsService {
 		Usuario usuario = usuarioRepository.findByLogin(username)
 				.orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 		
-		
 		return User
 				.builder()
 				.username(usuario.getLogin())
 				.password(usuario.getSenha())
-				.roles("ADMIN")
+				.roles("USER")
 				.build();
 	}
 

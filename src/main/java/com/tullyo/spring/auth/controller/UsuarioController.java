@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,13 +16,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tullyo.spring.auth.assembler.TokenAssembler;
 import com.tullyo.spring.auth.assembler.UsuarioAssembler;
 import com.tullyo.spring.auth.domain.entity.Usuario;
 import com.tullyo.spring.auth.dto.CredenciaisTO;
 import com.tullyo.spring.auth.dto.TokenTO;
 import com.tullyo.spring.auth.dto.UsuarioRequestTO;
 import com.tullyo.spring.auth.dto.UsuarioResponseTO;
+import com.tullyo.spring.auth.security.jwt.JwtService;
 import com.tullyo.spring.auth.service.impl.UsuarioServiceImpl;
+
 
 @RestController
 @RequestMapping("/usuarios")
@@ -32,6 +36,9 @@ public class UsuarioController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private JwtService jwtService;
 
 	@PostMapping
 	public ResponseEntity<UsuarioResponseTO> salvar(@RequestBody UsuarioRequestTO usuarioRequestTO) {
@@ -57,9 +64,12 @@ public class UsuarioController {
 	@PostMapping("/auth")
 	public ResponseEntity<TokenTO> autenticar(@RequestBody CredenciaisTO credenciais) {
 		Usuario usuario = UsuarioAssembler.from(credenciais);
-		usuarioService.autenticar(usuario);
 		
-		ResponseEntity<TokenTO> response = ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+		UserDetails userDetails = usuarioService.autenticar(usuario);
+		String token = jwtService.gerarToken(usuario);
+		TokenTO tokenTO = TokenAssembler.from(userDetails.getUsername(), token);
+		
+		ResponseEntity<TokenTO> response = ResponseEntity.status(HttpStatus.ACCEPTED).body(tokenTO);
 		return response;
 	}
 }

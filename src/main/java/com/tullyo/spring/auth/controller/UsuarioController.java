@@ -1,5 +1,8 @@
 package com.tullyo.spring.auth.controller;
 
+import static org.springframework.http.HttpStatus.ACCEPTED;
+import static org.springframework.http.HttpStatus.CREATED;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tullyo.spring.auth.assembler.UsuarioAssembler;
 import com.tullyo.spring.auth.domain.entity.Usuario;
+import com.tullyo.spring.auth.dto.CredenciaisTO;
+import com.tullyo.spring.auth.dto.TokenTO;
+import com.tullyo.spring.auth.dto.UsuarioRequestTO;
 import com.tullyo.spring.auth.dto.UsuarioResponseTO;
 import com.tullyo.spring.auth.service.impl.UsuarioServiceImpl;
 
@@ -35,7 +41,7 @@ public class UsuarioController {
 		usuarioService.salvar(usuario);
 
 		UsuarioResponseTO usuarioResponseTO = UsuarioAssembler.from(usuario);
-		ResponseEntity<UsuarioResponseTO> resposne = ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponseTO);
+		ResponseEntity<UsuarioResponseTO> resposne = ResponseEntity.status(CREATED).body(usuarioResponseTO);
 		return resposne;
 	}
 
@@ -44,8 +50,16 @@ public class UsuarioController {
 		List<Usuario> usuarios = usuarioService.findAll();
 		List<UsuarioResponseTO> usuariosResponseTO = UsuarioAssembler.from(usuarios);
 		
-		ResponseEntity<List<UsuarioResponseTO>> response = ResponseEntity.status(HttpStatus.ACCEPTED).body(usuariosResponseTO);
+		ResponseEntity<List<UsuarioResponseTO>> response = ResponseEntity.status(ACCEPTED).body(usuariosResponseTO);
 		return response;
 	}
 	
+	@PostMapping("/auth")
+	public ResponseEntity<TokenTO> autenticar(@RequestBody CredenciaisTO credenciais) {
+		Usuario usuario = UsuarioAssembler.from(credenciais);
+		usuarioService.autenticar(usuario);
+		
+		ResponseEntity<TokenTO> response = ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+		return response;
+	}
 }

@@ -1,4 +1,4 @@
-package com.tullyo.spring.auth.controller;
+package com.tullyo.spring.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

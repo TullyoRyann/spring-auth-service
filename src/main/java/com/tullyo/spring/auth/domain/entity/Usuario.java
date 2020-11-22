@@ -37,7 +37,7 @@ public class Usuario {
 	private String senha;
 
 	@Column
-	@ElementCollection(targetClass = String.class, fetch = FetchType.LAZY)
+	@ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "ROLES")
 	private List<String> roles;
 

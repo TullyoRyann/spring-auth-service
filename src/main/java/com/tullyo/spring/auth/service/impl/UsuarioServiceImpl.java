@@ -49,12 +49,24 @@ public class UsuarioServiceImpl implements UserDetailsService {
 		Usuario usuario = usuarioRepository.findByLogin(username)
 				.orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 		
+		String[] roles = getGrupos(usuario);
+		
 		return User
 				.builder()
 				.username(usuario.getLogin())
 				.password(usuario.getSenha())
-				.roles("USER")
+				.roles(roles)
 				.build();
+	}
+
+	private String[] getGrupos(Usuario usuario) {
+		int size = usuario.getRoles().size();
+		String[] roles = new String [size];
+
+		for (int i = 0; i < size; i++) {
+			roles[i] = usuario.getRoles().get(i);
+		}
+		return roles;
 	}
 
 }
